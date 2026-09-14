@@ -47,4 +47,5 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
-main_test.dart
+# Solusi dosen, jangan ikut ke-push / ke-clone mahasiswa
+/lib/main_test.dart
