@@ -38,15 +38,36 @@ class _DemoHomePageState extends State<DemoHomePage> {
 
   Key _streamKey = UniqueKey();
   void _runSyncProcess() {
-    //
+    setState(() {
+      _statusSync = "Proses Sync dimulai...";
+    });
+
+    sleep(const Duration(seconds: 3));
+
+    setState(() {
+      _statusSync = "Selesai! (Terjadi lag/freeze 3 detik pada UI)";
+    });
   }
 
   Future<void> _runAsyncProcess() async {
-    //
+    setState(() {
+      _isLoadingAsync = true;
+      _statusAsync = "Proses Async dimulai...";
+    });
+
+    await Future.delayed(const Duration(seconds: 3));
+
+    setState(() {
+      _isLoadingAsync = false;
+      _statusAsync = "Selesai! (UI tetap responsif dan lancar)";
+    });
   }
 
   Stream<int> _generateStreamData() async* {
-    //
+    for (int i = 1; i <= 5; i++) {
+      await Future.delayed(const Duration(seconds: 1));
+      yield i;
+    }
   }
 
   @override
