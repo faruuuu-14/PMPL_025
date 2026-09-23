@@ -1,244 +1,234 @@
-import 'dart:async';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
+import 'models/post_model.dart';
+import 'services/api_service.dart';
+
 void main() {
-  runApp(const DemoAsyncApp());
+  runApp(const MyApp());
 }
 
-class DemoAsyncApp extends StatelessWidget {
-  const DemoAsyncApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Demo Sync vs Async',
+      title: 'Portal Berita (Infinite Scroll)',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.light,
+        ),
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
       ),
-      home: const DemoHomePage(),
+      home: const NewsFeedScreen(),
     );
   }
 }
 
-class DemoHomePage extends StatefulWidget {
-  const DemoHomePage({super.key});
+class NewsFeedScreen extends StatefulWidget {
+  const NewsFeedScreen({super.key});
 
   @override
-  State<DemoHomePage> createState() => _DemoHomePageState();
+  State<NewsFeedScreen> createState() => _NewsFeedScreenState();
 }
 
-class _DemoHomePageState extends State<DemoHomePage> {
-  String _statusSync = "Belum dijalankan";
-  String _statusAsync = "Belum dijalankan";
-  bool _isLoadingAsync = false;
+class _NewsFeedScreenState extends State<NewsFeedScreen> {
+  final ApiService _apiService = ApiService();
+  final ScrollController _scrollController = ScrollController();
 
-  Key _streamKey = UniqueKey();
-  void _runSyncProcess() {
-    setState(() {
-      _statusSync = "Proses Sync dimulai...";
-    });
+  final List<PostModel> _posts = [];
 
-    sleep(const Duration(seconds: 3));
+  // State variables
+  int _page = 1;
+  final int _limit = 10;
+  bool _isFirstLoading = true;
+  bool _isLoadingMore = false;
+  bool _hasMoreData = true;
+  String? _errorMessage;
 
-    setState(() {
-      _statusSync = "Selesai! (Terjadi lag/freeze 3 detik pada UI)";
+  @override
+  void initState() {
+    super.initState();
+    _fetchInitialPosts();
+
+    // Listener untuk mendeteksi scroll mahasiswa sampai ke bawah (Infinite Scroll)
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 200 &&
+          !_isLoadingMore &&
+          _hasMoreData &&
+          _errorMessage == null) {
+        _fetchNextPosts();
+      }
     });
   }
 
-  Future<void> _runAsyncProcess() async {
+  // Load pertama kali saat halaman dibuka
+  Future<void> _fetchInitialPosts() async {
     setState(() {
-      _isLoadingAsync = true;
-      _statusAsync = "Proses Async dimulai...";
+      _isFirstLoading = true;
+      _errorMessage = null;
+      _page = 1;
+      _posts.clear();
     });
 
-    await Future.delayed(const Duration(seconds: 3));
-
-    setState(() {
-      _isLoadingAsync = false;
-      _statusAsync = "Selesai! (UI tetap responsif dan lancar)";
-    });
-  }
-
-  Stream<int> _generateStreamData() async* {
-    for (int i = 1; i <= 5; i++) {
-      await Future.delayed(const Duration(seconds: 1));
-      yield i;
+    try {
+      final newPosts = await _apiService.fetchPosts(page: _page, limit: _limit);
+      setState(() {
+        _posts.addAll(newPosts);
+        _isFirstLoading = false;
+        if (newPosts.length < _limit) _hasMoreData = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isFirstLoading = false;
+        _errorMessage = e.toString();
+      });
     }
+  }
+
+  // Load halaman berikutnya saat di-scroll ke bawah
+  Future<void> _fetchNextPosts() async {
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    try {
+      _page++;
+      final newPosts = await _apiService.fetchPosts(page: _page, limit: _limit);
+      setState(() {
+        if (newPosts.isEmpty) {
+          _hasMoreData = false;
+        } else {
+          _posts.addAll(newPosts);
+        }
+        _isLoadingMore = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingMore = false;
+      });
+      // Tampilkan snackbar jika gagal memuat halaman berikutnya
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memuat berita tambahan: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Demo: Sync vs Async Flutter'),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
+        title: const Text('Feed Berita Terkini'),
+        centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+      body: _buildBody(),
+    );
+  }
+
+  Widget _buildBody() {
+    // 1. Loading State (Awal)
+    if (_isFirstLoading) {
+      return const Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Card(
-              color: Colors.amber.shade100,
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'INDIKATOR RESPONSIVITAS UI',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      'Perhatikan animasi spinner di bawah. Jika spinner mendadak MACET/DIAM, artinya UI terblokir!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    SizedBox(height: 12),
-                    CircularProgressIndicator(),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '1. Tanpa Async (Synchronous / Blocking)',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Status: $_statusSync'),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: _runSyncProcess,
-                        icon: const Icon(Icons.block),
-                        label: const Text('Jalankan Sync (UI Akan Freeze)'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '2. Dengan Async (Future / Non-Blocking)',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Status: $_statusAsync'),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: _isLoadingAsync ? null : _runAsyncProcess,
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text('Jalankan Async (UI Tetap Smooth)'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '3. Stream (Aliran Data)',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.refresh),
-                          onPressed: () {
-                            setState(() {
-                              _streamKey = UniqueKey(); // Re-trigger Stream
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    StreamBuilder<int>(
-                      key: _streamKey,
-                      stream: _generateStreamData(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Text('Stream: Menunggu data pertama...');
-                        } else if (snapshot.hasData) {
-                          return Text(
-                            'Data Diterima Realtime: Angka ${snapshot.data} / 5',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
-                            ),
-                          );
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.done) {
-                          return const Text(
-                            'Stream: Selesai! Semua data terkirim.',
-                          );
-                        }
-                        return const Text('Stream belum aktif.');
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            CircularProgressIndicator(),
+            SizedBox(height: 12),
+            Text('Memuat berita...'),
           ],
         ),
+      );
+    }
+
+    // 2. Error State
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.wifi_off_rounded,
+                size: 64,
+                color: Colors.redAccent,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _fetchInitialPosts,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Coba Lagi'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // 3. Empty State
+    if (_posts.isEmpty) {
+      return const Center(child: Text('Belum ada berita tersedia.'));
+    }
+
+    // 4. Success State (List + Infinite Scroll)
+    return RefreshIndicator(
+      onRefresh: _fetchInitialPosts, // Fitur Pull to Refresh
+      child: ListView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(12),
+        itemCount: _posts.length + (_hasMoreData ? 1 : 0),
+        itemBuilder: (context, index) {
+          // Indikator loading kecil di paling bawah ListView saat fetch page baru
+          if (index == _posts.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          final post = _posts[index];
+          return Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '#${post.id} ${post.title}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    post.body,
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
