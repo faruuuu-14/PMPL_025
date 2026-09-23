@@ -1,172 +1,77 @@
-# PMP Pertemuan 1 — Demo Sync vs Async (Flutter)
+# Pemrograman Multi Platform Lanjutan (IT312)
 
-Template praktikum. Project ini dibuat di Linux, tapi **100% bisa jalan di Windows** tanpa penyesuaian khusus — yang penting Flutter SDK + Android SDK sudah terinstall.
+Repositori ini berisi kumpulan tugas, praktikum, dan proyek perkuliahan untuk mata kuliah **Pemrograman Multi Platform Lanjutan (IT312)** menggunakan framework **Flutter** dan bahasa pemrograman **Dart**.
 
-> Yang kamu clone = template. Yang kamu kerjakan = hanya `lib/main.dart`.
-> File solusi dosen (`lib/main_test.dart`) sengaja tidak ikut ke repo (masuk `.gitignore`).
+Repositori ini diperbarui secara berkala setiap pertemuan perkuliahan.
 
-## Yang kamu dapat vs yang kamu kerjakan
+---
 
-| File | Keterangan |
-|---|---|
-| `lib/main.dart` | **Template yang WAJIB kamu lengkapi.** Ada 3 bagian kosong: `_runSyncProcess`, `_runAsyncProcess`, `_generateStreamData`. |
-| `lib/main_test.dart` | Solusi/contoh dosen. **Tidak ada di repo**, jadi jangan dicari setelah clone. |
-| File lain (`android/`, `windows/`, `pubspec.yaml`, dll.) | **Jangan diubah/dihapus.** Sudah lintas-platform. |
+## 📚 Daftar Pertemuan & Progres Praktikum
 
-## Prasyarat (dianggap sudah aman)
+| Pertemuan | Topik Materi | Status | Snapshot / Branch |
+|---|---|:---:|---|
+| **Pertemuan 1** | Review PMP Dasar, Asynchronous (Future, `async`/`await`), dan Dart Stream (`async*`/`yield`) | ✅ Selesai | [Branch `pertemuan-1`](https://github.com/faruuuu-14/PMPL_025/tree/pertemuan-1) / [Tag `pertemuan-1`](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-1) |
+| **Pertemuan 2** | REST API Deep Dive: Dio HTTP Client, UI State Management (Loading, Error, Empty, Success), & Infinite Scroll Pagination | ✅ Selesai | [Branch `main`](https://github.com/faruuuu-14/PMPL_025) / [Tag `pertemuan-2`](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-2) |
+| **Pertemuan 3** | *Upcoming* | ⏳ Segera | - |
 
-- Flutter SDK terinstall (`flutter --version` jalan di PowerShell/CMD)
-- Android SDK + Android Studio terinstall
-- Git terinstall
-- Akun GitHub
+---
 
-Cek cepat di PowerShell:
+## 📌 Rincian Tiap Pertemuan
 
-```powershell
-flutter --version
-flutter doctor
-git --version
-```
+### 🔹 Pertemuan 1 — Review PMP Dasar & Dart Async
+* **Fokus:** Memahami perbedaan proses Synchronous (Blocking) vs Asynchronous (Non-Blocking) dan Stream realtime.
+* **Fitur Utama:**
+  * **Simulasi Synchronous:** Membuktikan bahwa pemanggilan `sleep()` memblokir *Main UI Thread* sehingga animasi spinner terhenti total selama 3 detik.
+  * **Simulasi Asynchronous:** Membuktikan bahwa `await Future.delayed()` memproses tugas di latar belakang (*background*) sehingga UI dan animasi tetap berputar lancar.
+  * **Stream Realtime:** Mengalirkan angka 1 hingga 5 bertahap tiap detik menggunakan generator `async*` dan `yield` yang didengarkan oleh widget `StreamBuilder`.
+* **Arsip:** Kode utuh pertemuan 1 dapat dilihat di [branch `pertemuan-1`](https://github.com/faruuuu-14/PMPL_025/tree/pertemuan-1).
 
-Kalau `flutter doctor` ada tanda `!` atau `X` di bagian Android toolchain / lisensi, bereskan dulu (lihat Langkah 3).
+### 🔹 Pertemuan 2 — REST API Deep Dive: Dio, State & Pagination
+* **Fokus:** Mengonsumsi REST API menggunakan client `Dio`, mengelola status UI secara menyeluruh, dan mengimplementasikan pagination *Infinite Scroll*.
+* **API Endpoint:** `https://jsonplaceholder.typicode.com/posts?_page={page}&_limit=10`
+* **Struktur Project:**
+  ```text
+  lib/
+  ├── main.dart             # UI Feed Berita, Infinite Scroll & State Management
+  ├── models/
+  │   └── post_model.dart   # Model Data & JSON Parser (fromJson)
+  └── services/
+      └── api_service.dart  # Dio Setup, BaseOptions, Interceptor & Error Handling
+  ```
+* **Fitur Utama:**
+  * **Dio Setup:** Konfigurasi terpusat `BaseOptions` (BaseUrl, connectTimeout 10s, receiveTimeout 10s) dan `LogInterceptor`.
+  * **Infinite Scroll:** `ScrollController` mendeteksi scroll saat pengguna mendekati 200px dari dasar halaman untuk otomatis memuat halaman berita berikutnya.
+  * **4 UI States:**
+    1. *Loading State:* Indikator loading saat pertama kali memuat data.
+    2. *Error State:* Tampilan ramah pengguna saat koneksi timeout / terputus beserta tombol *Coba Lagi*.
+    3. *Empty State:* Tampilan ketika tidak ada data berita.
+    4. *Success State:* Tampilan daftar berita dalam bentuk kartu dengan fitur *Pull to Refresh* (`RefreshIndicator`).
 
-## Langkah 1 — Clone repo template
+---
 
-Buka PowerShell, masuk ke folder kerja (misal `Documents`), lalu:
+## 🚀 Panduan Menjalankan Proyek
 
-```powershell
-git clone https://github.com/terserah/pmp_01.git
-cd pmp_01
-```
+### 1. Prasyarat
+* Flutter SDK (Direkomendasikan versi `3.47.4` atau terbaru)
+* Dart SDK (versi `3.13.3` atau kompatibel)
+* Google Chrome atau browser web modern
 
-Catatan:
+### 2. Menjalankan Aplikasi
+1. Buka terminal pada folder proyek:
+   ```powershell
+   flutter pub get
+   ```
+2. Jalankan aplikasi pada Google Chrome:
+   ```powershell
+   flutter run -d chrome --web-port 8080
+   ```
+   *(Atau tekan tombol **F5 / Play** langsung di VS Code)*.
+3. Akses aplikasi melalui browser pada alamat:
+   👉 **`http://localhost:8080`**
 
-- Project dibuat di Linux — **tidak masalah**. Warning soal `LF will be replaced by CRLF` boleh diabaikan.
-- Tidak perlu install Dart, Gradle, atau library manual. Semua ikut Flutter SDK + langkah `flutter pub get` di bawah.
-- Folder `windows/`, `linux/`, `android/` memang sengaja ikut ke-clone. Jangan dihapus.
+---
 
-## Langkah 2 — Install dependency (wajib sekali tiap habis clone)
-
-```powershell
-flutter pub get
-```
-
-Perintah ini membaca `pubspec.yaml` + `pubspec.lock` dan mengunduh package (`cupertino_icons`, `flutter_lints`, dll.) ke folder `.dart_tool/` lokal. Tanpa ini project tidak bisa di-run.
-
-## Langkah 3 — Bereskan lisensi Android (sekali saja)
-
-```powershell
-flutter doctor --android-licenses
-# tekan y / Enter untuk semua lisensi sampai selesai
-flutter doctor
-```
-
-Target akhir: bagian `Flutter`, `Windows Version`, `Android toolchain`, dan `Connected device` (atau `Chrome`) centang hijau. Bagian `Visual Studio` hanya wajib kalau mau run sebagai aplikasi Windows desktop — kalau cukup run di Chrome/HP Android, boleh diabaikan.
-
-Cek device yang tersedia:
-
-```powershell
-flutter devices
-```
-
-## Langkah 4 — Jalankan template (pastikan jalan SEBELUM mengerjakan)
-
-Pilih **salah satu** yang paling gampang:
-
-```powershell
-# Paling gampang, tanpa emulator:
-flutter run -d chrome
-
-# Atau sebagai aplikasi Windows:
-flutter run -d windows
-
-# Atau ke HP/emulator Android (buka dulu emulatornya di Android Studio / colok HP + USB debugging):
-flutter run
-```
-
-Yang harus tampil: halaman **"Demo: Sync vs Async Flutter"** dengan spinner + 3 card (Sync merah, Async hijau, Stream biru). Tombolnya belum ngapa-ngapain — itu normal, karena memang tugasmu mengisinya.
-
-Kalau error build pertama kali, coba:
-
-```powershell
-flutter clean
-flutter pub get
-flutter run -d chrome
-```
-
-## Langkah 5 — Kerjakan tugas
-
-1. Buka folder project di VS Code / Android Studio.
-2. Edit **hanya** `lib/main.dart`, lengkapi 3 fungsi yang masih kosong:
-   - `_runSyncProcess()`
-   - `_runAsyncProcess()`
-   - `_generateStreamData()`
-3. Ikuti instruksi dosen/asisten untuk isi tiap fungsi.
-4. Simpan, lalu ulangi `flutter run -d chrome` untuk testing. Perhatikan spinner: tombol Sync harus bikin UI freeze, tombol Async harus tetap smooth.
-5. Opsional cek kode rapi:
-
-```powershell
-flutter analyze
-```
-
-## Langkah 6 — Push ke repository masing-masing (wajib)
-
-Jangan push ke repo template. Alurnya: clone template → putuskan remote → sambungkan ke repo pribadimu → push.
-
-```powershell
-# 1. Pastikan kamu di dalam folder project dan pekerjaanmu sudah disimpan
-git status
-
-# 2. Set identitas git (sekali saja per laptop)
-git config --global user.name "Nama Kamu"
-git config --global user.email "nim@student.ac.id"
-
-# 3. Simpan pekerjaanmu
-git add lib/main.dart
-git commit -m "Selesaikan tugas sync async - NIM Kamu"
-
-# 4. Buat repository BARU dan KOSONG di GitHub milikmu
-#    (jangan centang Add README / .gitignore / license), misal: pmp_01_NIM
-
-# 5. Putuskan sambungan ke repo template, sambungkan ke repo milikmu
-git remote -v
-git remote remove origin
-git remote add origin https://github.com/USERNAME-KAMU/pmp_01_NIM.git
-
-# 6. Push
-git branch -M main
-git push -u origin main
-```
-
-Tugas berikutnya cukup:
-
-```powershell
-git add lib/main.dart
-git commit -m "Pesan perubahan"
-git push
-```
-
-> Login GitHub via browser akan meminta otorisasi. Kalau diminta password di terminal dan gagal, pakai **Personal Access Token (classic)** sebagai password, atau login via `gh auth login` / Git Credential Manager.
-
-## Langkah 7 — Kumpulkan
-
-Kumpulkan **link repo GitHub milikmu** (misal `https://github.com/USERNAME-KAMU/pmp_01_NIM`) sesuai instruksi dosen. Pastikan repo **public** (atau private + dosen di-invite) dan commit terakhir berisi `lib/main.dart` yang sudah dilengkapi.
-
-## Troubleshooting Windows
-
-| Gejala | Solusi |
-|---|---|
-| `flutter` tidak dikenal | Tutup-buka ulang PowerShell setelah install Flutter; pastikan folder `flutter\bin` ada di PATH. |
-| `Android license status unknown` | Jalankan `flutter doctor --android-licenses`, terima semua, ulangi `flutter doctor`. |
-| `No connected devices` | Untuk Chrome: install Chrome. Untuk Android: buka Device Manager di Android Studio dan jalankan emulator, atau colok HP + aktifkan USB debugging. |
-| Error Gradle / `Could not resolve` saat `flutter run` | `flutter clean` → `flutter pub get` → `flutter run` lagi. Pastikan internet tidak diblokir proxy kampus. |
-| Path error / build gagal di OneDrive | Pindahkan clone ke path pendek tanpa spasi, misal `C:\src\pmp_01`, jangan di dalam OneDrive. |
-| Prompt `LF will be replaced by CRLF` | Abaikan, normal untuk project Linux → Windows. |
-| `flutter test` bilang tidak ada test | Normal. Folder `test/` memang dikosongkan di template. |
-| Tidak bisa push (403 / authentication failed) | Repo pribadimu belum dibuat / URL remote salah (`git remote -v` untuk cek), atau perlu login ulang + PAT. |
-
-## FAQ cepat
-
-- **Perlu install ulang SDK/library versi Linux?** Tidak. Cukup `flutter pub get`. Versi Flutter yang dipakai dosen: Flutter `3.47.4` / Dart `3.13.3` — kalau versimu sedikit lebih baru umumnya tetap jalan, asal `flutter doctor` hijau.
-- **Perlu `flutter create` ulang di Windows?** Tidak. Folder platform (`android/`, `windows/`, dll.) sudah ada.
-- **Bolehkah edit file selain `lib/main.dart`?** Jangan, kecuali disuruh dosen. Biar nilai fokus ke logika sync/async/stream.
+## 🛠️ Spesifikasi Lingkungan Pengembangan
+* **Framework:** Flutter 3.47.4 (Channel stable)
+* **Language:** Dart 3.13.3
+* **Tools:** Visual Studio Code, Git, Google Chrome
