@@ -13,11 +13,15 @@ class UserModel {
     required this.avatar,
   });
 
-  get name => null;
+  String get name => '$firstName $lastName';
 
-  static Object? fromJson(json) {}
-
-  // TODO: buat factory UserModel.fromJson untuk mapping respons
-  // GET https://reqres.in/api/users.
-  // Field JSON: id, email, first_name, last_name, avatar.
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] as int,
+      email: json['email'] as String? ?? '',
+      firstName: json['first_name'] as String? ?? '',
+      lastName: json['last_name'] as String? ?? '',
+      avatar: json['avatar'] as String? ?? '',
+    );
+  }
 }

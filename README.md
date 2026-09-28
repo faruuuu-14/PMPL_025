@@ -6,11 +6,11 @@ Repositori ini mendokumentasikan pengerjaan tugas, modul praktikum, dan proyek p
 
 ## Daftar Pertemuan dan Progres
 
-| Pertemuan | Topik Materi | Status | Snapshot / Referensi |
-|---|---|---|---|
+| Pertemuan   | Topik Materi                                                                                 | Status  | Snapshot / Referensi                                                                                                                                               |
+| ----------- | -------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Pertemuan 1 | Review PMP Dasar, Asynchronous (Future, `async`/`await`), dan Dart Stream (`async*`/`yield`) | Selesai | [Branch pertemuan-1](https://github.com/faruuuu-14/PMPL_025/tree/pertemuan-1) / [Tag pertemuan-1](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-1) |
-| Pertemuan 2 | REST API Deep Dive: Dio HTTP Client, UI State Management, dan Infinite Scroll Pagination | Selesai | [Branch main](https://github.com/faruuuu-14/PMPL_025) / [Tag pertemuan-2](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-2) |
-| Pertemuan 3 | Belum Dimulai | Terjadwal | - |
+| Pertemuan 2 | REST API Deep Dive: Dio HTTP Client, UI State Management, dan Infinite Scroll Pagination     | Selesai | [Branch main](https://github.com/faruuuu-14/PMPL_025) / [Tag pertemuan-2](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-2)                         |
+| Pertemuan 3 | Provider, Simulasi Login, dan REST API Reqres.in                                             | Selesai | Branch main                                                                                                                                                        |
 
 ---
 
@@ -18,24 +18,24 @@ Repositori ini mendokumentasikan pengerjaan tugas, modul praktikum, dan proyek p
 
 ### Pertemuan 1 — Review PMP Dasar dan Dart Async
 
-Fokus pembahasan pada pertemuan ini meliputi evaluasi pemahaman arsitektur dasar Flutter serta implementasi pemrosesan asinkronus untuk menjaga responsivitas antarmuka aplikasi (*User Interface*).
+Fokus pembahasan pada pertemuan ini meliputi evaluasi pemahaman arsitektur dasar Flutter serta implementasi pemrosesan asinkronus untuk menjaga responsivitas antarmuka aplikasi (_User Interface_).
 
-* **Simulasi Synchronous (Blocking):**
-  Menggunakan `sleep()` untuk mendemonstrasikan pemblokiran pada *Main UI Thread*. Pemanggilan fungsi ini menyebabkan animasi indikator visual mengalami pembekuan (*freeze*) selama 3 detik.
-* **Simulasi Asynchronous (Non-Blocking):**
-  Menggunakan `await Future.delayed()` untuk mengalihkan proses intensif ke latar belakang (*background*), memastikan antarmuka pengguna tetap berjalan secara lancar tanpa hambatan.
-* **Dart Stream Realtime:**
+- **Simulasi Synchronous (Blocking):**
+  Menggunakan `sleep()` untuk mendemonstrasikan pemblokiran pada _Main UI Thread_. Pemanggilan fungsi ini menyebabkan animasi indikator visual mengalami pembekuan (_freeze_) selama 3 detik.
+- **Simulasi Asynchronous (Non-Blocking):**
+  Menggunakan `await Future.delayed()` untuk mengalihkan proses intensif ke latar belakang (_background_), memastikan antarmuka pengguna tetap berjalan secara lancar tanpa hambatan.
+- **Dart Stream Realtime:**
   Mengalirkan data sekuensial (angka 1 hingga 5) secara berkala tiap detik menggunakan generator `async*` dan `yield`, yang dipantau secara reaktif menggunakan widget `StreamBuilder`.
-* **Arsip Kode:**
+- **Arsip Kode:**
   Seluruh implementasi modul pertemuan 1 tersimpan secara mandiri pada [Branch pertemuan-1](https://github.com/faruuuu-14/PMPL_025/tree/pertemuan-1).
 
 ### Pertemuan 2 — REST API Deep Dive: Dio, State Management, dan Pagination
 
-Fokus pembahasan pada pertemuan ini adalah integrasi jaringan tingkat lanjut menggunakan paket `Dio`, penanganan status tampilan antarmuka secara komprehensif, serta penerapan teknik *Infinite Scroll*.
+Fokus pembahasan pada pertemuan ini adalah integrasi jaringan tingkat lanjut menggunakan paket `Dio`, penanganan status tampilan antarmuka secara komprehensif, serta penerapan teknik _Infinite Scroll_.
 
-* **Endpoint API:**
+- **Endpoint API:**
   `https://jsonplaceholder.typicode.com/posts?_page={page}&_limit=10`
-* **Arsitektur dan Struktur Berkas:**
+- **Arsitektur dan Struktur Berkas:**
   ```text
   lib/
   ├── main.dart             # Antarmuka Feed Berita, State Management, dan Infinite Scroll
@@ -44,36 +44,50 @@ Fokus pembahasan pada pertemuan ini adalah integrasi jaringan tingkat lanjut men
   └── services/
       └── api_service.dart  # Konfigurasi Dio, BaseOptions, Interceptor, dan Error Handling
   ```
-* **Komponen Teknis:**
-  * **Dio Client Setup:** Konfigurasi `BaseOptions` terpusat (`baseUrl`, batas waktu `connectTimeout` dan `receiveTimeout` selama 10 detik) serta aktivasi `LogInterceptor` untuk inspeksi jaringan.
-  * **Infinite Scroll Pagination:** Penggunaan `ScrollController` dengan pendeteksian ambang batas (200 piksel sebelum batas akhir) untuk memicu pemanggilan data halaman berikutnya secara otomatis.
-  * **Pola UI State Management:**
-    1. *Loading State:* Menampilkan indikator proses saat pertama kali memuat data.
-    2. *Error State:* Menangkap `DioException` dan memetakan kode status menjadi pesan kesalahan yang informatif dengan opsi *Coba Lagi*.
-    3. *Empty State:* Tampilan notifikasi ketika respons data kosong.
-    4. *Success State:* Penyajian data dalam bentuk kartu daftar dengan dukungan fitur pembaruan *Pull to Refresh* (`RefreshIndicator`).
+- **Komponen Teknis:**
+  - **Dio Client Setup:** Konfigurasi `BaseOptions` terpusat (`baseUrl`, batas waktu `connectTimeout` dan `receiveTimeout` selama 10 detik) serta aktivasi `LogInterceptor` untuk inspeksi jaringan.
+  - **Infinite Scroll Pagination:** Penggunaan `ScrollController` dengan pendeteksian ambang batas (200 piksel sebelum batas akhir) untuk memicu pemanggilan data halaman berikutnya secara otomatis.
+  - **Pola UI State Management:**
+    1. _Loading State:_ Menampilkan indikator proses saat pertama kali memuat data.
+    2. _Error State:_ Menangkap `DioException` dan memetakan kode status menjadi pesan kesalahan yang informatif dengan opsi _Coba Lagi_.
+    3. _Empty State:_ Tampilan notifikasi ketika respons data kosong.
+    4. _Success State:_ Penyajian data dalam bentuk kartu daftar dengan dukungan fitur pembaruan _Pull to Refresh_ (`RefreshIndicator`).
+
+### Pertemuan 3 — Provider, Simulasi Login, dan REST API Reqres.in
+
+Fokus pertemuan ini adalah pemisahan state autentikasi dan data menggunakan `Provider`, pemetaan JSON ke model, serta penanganan state loading, empty, dan error.
+
+- **Login Demo:** Email tidak boleh kosong dan password minimal 6 karakter. Proses login disimulasikan selama 1 detik; tidak memerlukan akun server.
+- **Endpoint API:** `https://reqres.in/api/users?page=1&per_page=10`, menggunakan header `x-api-key: reqres-free-v1`. Token login demo dipakai untuk state aplikasi, bukan dikirim sebagai header Bearer ke endpoint ini.
+- **Pemetaan Pengguna:** `UserModel.fromJson` membaca `id`, `email`, `first_name`, `last_name`, dan `avatar` dari objek `data` pada respons Reqres.in.
+- **State Data:** `DataProvider` mengelola `initial`, `loading`, `loaded`, `empty`, dan `error`, serta menyediakan pemuatan ulang melalui `RefreshIndicator`.
+- **Materi Lanjutan:** `ProxyProvider` diperkenalkan sebagai teaser untuk meneruskan perubahan token antar-provider; praktikum ini masih menggunakan `MultiProvider`.
 
 ---
 
 ## Panduan Menjalankan Proyek
 
 ### Prasyarat Sistem
-* Flutter SDK versi 3.47.4 (Channel stable) atau yang lebih baru
-* Dart SDK versi 3.13.3 atau kompatibel
-* Browser Google Chrome / Microsoft Edge
+
+- Flutter SDK versi 3.47.4 (Channel stable) atau yang lebih baru
+- Dart SDK versi 3.13.3 atau kompatibel
+- Browser Google Chrome / Microsoft Edge
 
 ### Langkah Eksekusi
 
 1. Unduh seluruh dependensi proyek:
+
    ```powershell
    flutter pub get
    ```
 
 2. Jalankan aplikasi pada platform web dengan port terdefinisi:
+
    ```powershell
    flutter run -d chrome --web-port 8080
    ```
-   *(Alternatif: Buka proyek pada Visual Studio Code dan tekan tombol **F5**)*.
+
+   _(Alternatif: Buka proyek pada Visual Studio Code dan tekan tombol **F5**)_.
 
 3. Buka peramban web pada alamat:
    `http://localhost:8080`
@@ -82,7 +96,7 @@ Fokus pembahasan pada pertemuan ini adalah integrasi jaringan tingkat lanjut men
 
 ## Spesifikasi Lingkungan Pengembangan
 
-* **Framework:** Flutter 3.47.4 (Channel stable)
-* **Bahasa Pemrograman:** Dart 3.13.3
-* **Editor:** Visual Studio Code
-* **Version Control:** Git & GitHub
+- **Framework:** Flutter 3.47.4 (Channel stable)
+- **Bahasa Pemrograman:** Dart 3.13.3
+- **Editor:** Visual Studio Code
+- **Version Control:** Git & GitHub
