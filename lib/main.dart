@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
-
-import 'models/post_model.dart';
+import 'models/user_model.dart';
 import 'services/api_service.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'providers/data_provider.dart';
+import 'theme/app_theme.dart';
+import 'screens/login_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp( 
+    MultiProvider(providers:[
+      ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ChangeNotifierProvider(create: (_) => DataProvider()),
+    ],
+    child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,19 +25,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Portal Berita (Infinite Scroll)',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
+      title : 'Provider MultiProvider App',
+      theme : AppTheme.light,
+      home  : Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          return auth.isAuthenticated ? const HomeScreen() : const LoginScreen();
+        },
       ),
-      home: const NewsFeedScreen(),
     );
   }
 }
+        
 
 class NewsFeedScreen extends StatefulWidget {
   const NewsFeedScreen({super.key});
@@ -38,7 +48,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   final ApiService _apiService = ApiService();
   final ScrollController _scrollController = ScrollController();
 
-  final List<PostModel> _posts = [];
+  final List<UserModel> _users = [];
 
   // State variables
   int _page = 1;
@@ -71,15 +81,15 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       _isFirstLoading = true;
       _errorMessage = null;
       _page = 1;
-      _posts.clear();
+      _users.clear();
     });
 
     try {
-      final newPosts = await _apiService.fetchPosts(page: _page, limit: _limit);
+      final newUsers = await _apiService.fetchUsers(page: _page, limit: _limit);
       setState(() {
-        _posts.addAll(newPosts);
+        _users.addAll(newUsers as Iterable<UserModel>);
         _isFirstLoading = false;
-        if (newPosts.length < _limit) _hasMoreData = false;
+        if (newUsers.length < _limit) _hasMoreData = false;
       });
     } catch (e) {
       setState(() {
@@ -97,12 +107,12 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
 
     try {
       _page++;
-      final newPosts = await _apiService.fetchPosts(page: _page, limit: _limit);
+      final newUsers = await _apiService.fetchUsers(page: _page, limit: _limit);
       setState(() {
-        if (newPosts.isEmpty) {
+        if (newUsers.isEmpty) {
           _hasMoreData = false;
         } else {
-          _posts.addAll(newPosts);
+          _users.addAll(newUsers as Iterable<UserModel>);
         }
         _isLoadingMore = false;
       });
@@ -183,8 +193,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
     }
 
     // 3. Empty State
-    if (_posts.isEmpty) {
-      return const Center(child: Text('Belum ada berita tersedia.'));
+    if (_users.isEmpty) {
+      return const Center(child: Text('Belum ada pengguna tersedia.'));
     }
 
     // 4. Success State (List + Infinite Scroll)
@@ -193,17 +203,17 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       child: ListView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.all(12),
-        itemCount: _posts.length + (_hasMoreData ? 1 : 0),
+        itemCount: _users.length + (_hasMoreData ? 1 : 0),
         itemBuilder: (context, index) {
           // Indikator loading kecil di paling bawah ListView saat fetch page baru
-          if (index == _posts.length) {
+          if (index == _users.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Center(child: CircularProgressIndicator()),
             );
           }
 
-          final post = _posts[index];
+          final user = _users[index];
           return Card(
             margin: const EdgeInsets.only(bottom: 12),
             elevation: 2,
@@ -213,7 +223,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '#${post.id} ${post.title}',
+                    '#${user.id} ${user.name}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -221,7 +231,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    post.body,
+                    user.email,
                     style: TextStyle(color: Colors.grey.shade700),
                   ),
                 ],

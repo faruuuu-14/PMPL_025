@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../models/post_model.dart';
+import '../models/user_model.dart';
 
 class ApiService {
   late final Dio _dio;
@@ -27,13 +27,13 @@ class ApiService {
   }
 
   // TODO 3: Method untuk mengambil daftar berita dengan pagination
-  Future<List<PostModel>> fetchPosts({
+  Future<List<Object?>> fetchUsers({
     required int page,
-    int limit = 10,
+    int limit = 10, String? token,
   }) async {
     try {
       final response = await _dio.get(
-        '/posts',
+        '/users',
         queryParameters: {
           '_page': page,
           '_limit': limit,
@@ -43,7 +43,7 @@ class ApiService {
       if (response.statusCode == 200) {
         final List data = response.data;
         return data
-            .map((json) => PostModel.fromJson(json))
+            .map((json) => UserModel.fromJson(json))
             .toList();
       }
 
