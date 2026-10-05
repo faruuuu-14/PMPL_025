@@ -9,8 +9,9 @@ Repositori ini mendokumentasikan pengerjaan tugas, modul praktikum, dan proyek p
 | Pertemuan   | Topik Materi                                                                                 | Status  | Snapshot / Referensi                                                                                                                                               |
 | ----------- | -------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Pertemuan 1 | Review PMP Dasar, Asynchronous (Future, `async`/`await`), dan Dart Stream (`async*`/`yield`) | Selesai | [Branch pertemuan-1](https://github.com/faruuuu-14/PMPL_025/tree/pertemuan-1) / [Tag pertemuan-1](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-1) |
-| Pertemuan 2 | REST API Deep Dive: Dio HTTP Client, UI State Management, dan Infinite Scroll Pagination     | Selesai | [Branch main](https://github.com/faruuuu-14/PMPL_025) / [Tag pertemuan-2](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-2)                         |
-| Pertemuan 3 | Provider, Simulasi Login, dan REST API Reqres.in                                             | Selesai | Branch main                                                                                                                                                        |
+| Pertemuan 2 | REST API Deep Dive: Dio HTTP Client, UI State Management, dan Infinite Scroll Pagination     | Selesai | [Branch pertemuan-2](https://github.com/faruuuu-14/PMPL_025/tree/pertemuan-2) / [Tag pertemuan-2](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-2) |
+| Pertemuan 3 | Provider, Simulasi Login, dan REST API Reqres.in                                             | Selesai | [Branch pertemuan-3](https://github.com/faruuuu-14/PMPL_025/tree/pertemuan-3) / [Tag pertemuan-3](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-3) |
+| Pertemuan 4 | Firebase Authentication, Email & Password Auth, dan Auth State Listener dengan Provider     | Selesai | [Branch pertemuan-4](https://github.com/faruuuu-14/PMPL_025/tree/pertemuan-4) / [Tag pertemuan-4](https://github.com/faruuuu-14/PMPL_025/releases/tag/pertemuan-4) |
 
 ---
 
@@ -62,6 +63,33 @@ Fokus pertemuan ini adalah pemisahan state autentikasi dan data menggunakan `Pro
 - **Pemetaan Pengguna:** `UserModel.fromJson` membaca `id`, `email`, `first_name`, `last_name`, dan `avatar` dari objek `data` pada respons Reqres.in.
 - **State Data:** `DataProvider` mengelola `initial`, `loading`, `loaded`, `empty`, dan `error`, serta menyediakan pemuatan ulang melalui `RefreshIndicator`.
 - **Materi Lanjutan:** `ProxyProvider` diperkenalkan sebagai teaser untuk meneruskan perubahan token antar-provider; praktikum ini masih menggunakan `MultiProvider`.
+
+### Pertemuan 4 — Firebase Authentication, Email & Password Auth, dan Provider State Gating
+
+Fokus praktikum pada pertemuan ini adalah merefaktor sistem autentikasi dari dummy token lokal menjadi integrasi penuh dengan **Cloud Firebase Authentication**, menangani pendaftaran (register), login, dan logout dengan email & password, mengolah pesan kesalahan autentikasi berbahasa Indonesia, serta menerapkan arsitektur *Auth Gating* berbasis `authStateChanges()` dan `Provider`.
+
+- **Skema Arsitektur & Auth Gating:**
+  - `UI Layer`: `LoginScreen` (toggle form Login & Register) dan router kondisional berbasis `Consumer<AuthProvider>`.
+  - `AuthProvider`: Menyimpan objek state aktif `User?` Firebase (bukan lagi dummy string) dan memicu `notifyListeners()`. Properti `isAuthenticated` dievaluasi dari `_user != null`. Properti `token` tetap mengembalikan identifier pengguna (`_user?.uid`) untuk menjaga kompatibilitas `HomeScreen` tanpa perlu modifikasi.
+  - `Firebase Auth Engine`: Menangani `createUserWithEmailAndPassword()` untuk pendaftaran dan `signInWithEmailAndPassword()` untuk login akun.
+  - `Realtime Session Listener`: `FirebaseAuth.instance.authStateChanges()` mendengarkan perubahan status login/logout secara langsung dan menyinkronkan state ke `AuthProvider.setUser(user)`, memungkinkan aplikasi berpindah rute secara reaktif tanpa pemanggilan ulang API manual.
+  - `Home REST (Dio)`: Halaman `HomeScreen` dan `ApiService` berbasis Dio tetap utuh dan memuat data pengguna secara normal setelah pengguna terautentikasi.
+- **Penanganan Kesalahan Berbahasa Indonesia:**
+  Memetakan kode kesalahan `FirebaseAuthException`:
+  - `invalid-email`: "Format email tidak valid."
+  - `user-disabled`: "Akun pengguna ini telah dinonaktifkan."
+  - `user-not-found`: "Akun dengan email ini tidak ditemukan. Silakan daftar terlebih dahulu."
+  - `wrong-password`: "Kata sandi salah. Silakan periksa kembali."
+  - `email-already-in-use`: "Email sudah terdaftar. Silakan gunakan email lain atau langsung masuk."
+  - `weak-password`: "Kata sandi terlalu lemah. Gunakan minimal 6 karakter."
+  - `operation-not-allowed`: "Metode autentikasi Email & Password belum diaktifkan di Firebase Console."
+  - `invalid-credential`: "Email atau kata sandi yang Anda masukkan salah."
+  - `network-request-failed`: "Koneksi internet bermasalah. Periksa jaringan Anda."
+  - `too-many-requests`: "Terlalu banyak percobaan gagal. Silakan coba lagi nanti."
+- **Konfigurasi Lingkungan & Troubleshooting:**
+  - `WidgetsFlutterBinding.ensureInitialized()`: Dipanggil sebelum `Firebase.initializeApp()` untuk memastikan binding engine siap.
+  - `Bypass reCAPTCHA Emulator`: `FirebaseAuth.instance.setSettings(appVerificationDisabledForTesting: true)` untuk kelancaran pengujian di lingkungan emulator.
+  - `minSdkVersion`: Dikonfigurasi minimal 21 pada `android/app/build.gradle.kts` guna mencegah `PlatformException (Channel Error)`.
 
 ---
 
