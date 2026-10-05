@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "953790512738",
+    "project_id": "pmpl-firebase-authentication",
+    "storage_bucket": "pmpl-firebase-authentication.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953790512738:android:3439fe33fe2dd666dbdb3b",
+        "android_client_info": {
+          "package_name": "com.example.pertemuan_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDL-KIulAqVmtSRnen8zQ3urIcUDar58Sg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

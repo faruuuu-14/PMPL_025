@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,6 +39,13 @@ class _LoginScreenState extends State<LoginScreen> {
         return 'Email sudah terdaftar. Silakan gunakan email lain atau langsung masuk.';
       case 'operation-not-allowed':
         return 'Metode autentikasi Email & Password belum diaktifkan di Firebase Console.';
+      case 'invalid-api-key':
+      case 'auth/invalid-api-key':
+      case 'api-key-not-valid':
+        return 'API key Firebase tidak valid. Buat ulang konfigurasi dengan FlutterFire CLI.';
+      case 'unauthorized-domain':
+      case 'auth/unauthorized-domain':
+        return 'Domain web belum diizinkan. Tambahkan localhost dan 127.0.0.1 di Authorized domains Firebase.';
       case 'weak-password':
         return 'Kata sandi terlalu lemah. Gunakan minimal 6 karakter.';
       case 'invalid-credential':
@@ -47,7 +55,13 @@ class _LoginScreenState extends State<LoginScreen> {
       case 'too-many-requests':
         return 'Terlalu banyak percobaan gagal. Silakan coba lagi nanti.';
       default:
-        return e.message ?? 'Terjadi kesalahan autentikasi (${e.code}).';
+        final message = e.message?.trim();
+        if (message == null ||
+            message.isEmpty ||
+            message.toLowerCase() == 'error') {
+          return 'Autentikasi gagal (kode: ${e.code}). Periksa konfigurasi Firebase dan Authorized domains.';
+        }
+        return message;
     }
   }
 
@@ -130,9 +144,8 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16),
               Text(
                 _isRegister ? 'Buat Akun Baru' : 'Selamat Datang',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               Text(
@@ -140,9 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? 'Daftarkan email dan kata sandi Anda'
                     : 'Masuk untuk mengakses layanan aplikasi',
                 textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
+                style: Theme.of(context).textTheme.bodyMedium
                     ?.copyWith(color: Colors.grey[600]),
               ),
               const SizedBox(height: 24),
@@ -237,4 +248,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
+}

@@ -41,46 +41,45 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDemoWebApiKeyForPracticeOnly12345',
-    appId: '1:100000000000:web:abcdef1234567890abcdef',
-    messagingSenderId: '100000000000',
-    projectId: 'pmpl-pertemuan-4',
-    authDomain: 'pmpl-pertemuan-4.firebaseapp.com',
-    storageBucket: 'pmpl-pertemuan-4.appspot.com',
+    apiKey: 'AIzaSyCMjAKj1qtcDWDj3PAya_g4A-TCVGtsxJc',
+    appId: '1:953790512738:web:c00b95a87518d46fdbdb3b',
+    messagingSenderId: '953790512738',
+    projectId: 'pmpl-firebase-authentication',
+    authDomain: 'pmpl-firebase-authentication.firebaseapp.com',
+    storageBucket: 'pmpl-firebase-authentication.firebasestorage.app',
+    measurementId: 'G-24CLCPSQJY',
   );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDemoAndroidApiKeyForPractice1234',
-    appId: '1:100000000000:android:abcdef1234567890abcdef',
-    messagingSenderId: '100000000000',
-    projectId: 'pmpl-pertemuan-4',
-    storageBucket: 'pmpl-pertemuan-4.appspot.com',
+    apiKey: 'AIzaSyDL-KIulAqVmtSRnen8zQ3urIcUDar58Sg',
+    appId: '1:953790512738:android:3439fe33fe2dd666dbdb3b',
+    messagingSenderId: '953790512738',
+    projectId: 'pmpl-firebase-authentication',
+    storageBucket: 'pmpl-firebase-authentication.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDemoIosApiKeyForPracticeOnly12345',
-    appId: '1:100000000000:ios:abcdef1234567890abcdef',
-    messagingSenderId: '100000000000',
-    projectId: 'pmpl-pertemuan-4',
-    storageBucket: 'pmpl-pertemuan-4.appspot.com',
+    apiKey: 'AIzaSyCElVPbM15VqByS3AqXgBhjoRgGjTdBof8',
+    appId: '1:953790512738:ios:daaf9f4dc94e01dcdbdb3b',
+    messagingSenderId: '953790512738',
+    projectId: 'pmpl-firebase-authentication',
+    storageBucket: 'pmpl-firebase-authentication.firebasestorage.app',
     iosBundleId: 'com.example.pertemuan1',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDemoMacosApiKeyForPracticeOnly123',
-    appId: '1:100000000000:ios:abcdef1234567890abcdef',
-    messagingSenderId: '100000000000',
-    projectId: 'pmpl-pertemuan-4',
-    storageBucket: 'pmpl-pertemuan-4.appspot.com',
+    apiKey: 'AIzaSyCElVPbM15VqByS3AqXgBhjoRgGjTdBof8',
+    appId: '1:953790512738:ios:daaf9f4dc94e01dcdbdb3b',
+    messagingSenderId: '953790512738',
+    projectId: 'pmpl-firebase-authentication',
+    storageBucket: 'pmpl-firebase-authentication.firebasestorage.app',
     iosBundleId: 'com.example.pertemuan1',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDemoWindowsApiKeyForPractice12345',
-    appId: '1:100000000000:web:abcdef1234567890abcdef',
-    messagingSenderId: '100000000000',
-    projectId: 'pmpl-pertemuan-4',
-    authDomain: 'pmpl-pertemuan-4.firebaseapp.com',
-    storageBucket: 'pmpl-pertemuan-4.appspot.com',
+    apiKey: 'AIzaSyCMjAKj1qtcDWDj3PAya_g4A-TCVGtsxJc',
+    appId: '1:953790512738:web:c28e7152a080712cdbdb3b',
+    messagingSenderId: '953790512738',
+    projectId: 'pmpl-firebase-authentication',
+    authDomain: 'pmpl-firebase-authentication.firebaseapp.com',
+    storageBucket: 'pmpl-firebase-authentication.firebasestorage.app',
+    measurementId: 'G-NK2JLH29BL',
   );
 }
