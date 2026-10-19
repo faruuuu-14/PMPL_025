@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/data_provider.dart';
+import 'providers/notes_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'theme/app_theme.dart';
@@ -86,8 +87,9 @@ class _AppBootstrapState extends State<AppBootstrap> {
     if (authProvider != null) {
       return MultiProvider(
         providers: [
-          ChangeNotifierProvider<AuthProvider>(create: (_) => authProvider),
+          ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
           ChangeNotifierProvider(create: (_) => DataProvider()),
+          ChangeNotifierProvider(create: (_) => NotesProvider()),
         ],
         child: const MyApp(),
       );
@@ -133,7 +135,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pertemuan 04 - Firebase Authentication',
+      title: 'Pertemuan 05 - Cloud Firestore Realtime',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       // Auth Gating: otomatis berpindah antara LoginScreen dan HomeScreen secara reaktif
